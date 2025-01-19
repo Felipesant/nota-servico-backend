@@ -37,7 +37,8 @@ app.get('/consulta/:placa', async (req, res) => {
             logger.warn(`Nenhum dado encontrado para a placa: ${placa}`);
             res.status(404).json({
                 status: 'error',
-                message: 'Placa não encontrada ou inválida.'
+                message: 'Placa não encontrada ou inválida.',
+                error: resultado
             });
         }
     } catch (error) {

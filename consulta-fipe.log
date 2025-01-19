@@ -1,0 +1,5 @@
+2025-01-19T14:42:04.905Z [INFO]: Servidor rodando na porta 3000
+2025-01-19T14:42:47.185Z [INFO]: Consulta recebida para a placa: DZS-789
+2025-01-19T14:42:48.194Z [WARN]: Nenhum dado encontrado para a placa: DZS-789
+2025-01-19T14:42:58.741Z [INFO]: Consulta recebida para a placa: DZS7892
+2025-01-19T14:42:59.683Z [INFO]: Consulta bem-sucedida para a placa: DZS7892
