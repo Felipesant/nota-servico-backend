@@ -1,7 +1,7 @@
 import express from 'express';
-import cors from 'cors'; // Importe o pacote cors
+import cors from 'cors';
 import { createLogger, format, transports } from 'winston';
-import { consultarPlaca } from './consulta.js'; // Certifique-se de usar o caminho correto
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const logger = createLogger({
     level: 'info',
@@ -21,24 +21,44 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Ative o CORS para todas as rotas
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  optionsSuccessStatus: 200
+}));
+
+// Middleware para parsing de JSON
+app.use(express.json());
+// Middleware para parsing de URL-encoded
+app.use(express.urlencoded({ extended: true }));
+
+// Configurar o proxy para a API externa
+app.use('/api', createProxyMiddleware({
+    target: 'https://www.tabelafipebrasil.com',
+    changeOrigin: true,
+    pathRewrite: {'^/api' : ''},
+    onProxyReq: (proxyReq, req, res) => {
+        proxyReq.setHeader('Referer', 'https://www.tabelafipebrasil.com/placa');
+    }
+}));
 
 app.get('/consulta/:placa', async (req, res) => {
     const placa = req.params.placa;
     logger.info(`Consulta recebida para a placa: ${placa}`);
 
     try {
-        const resultado = await consultarPlaca(placa);
+        // Fazer requisição via proxy
+        const proxyUrl = `http://localhost:${port}/api/placa?placa=${placa}`;
+        const reqProxy = await fetch(proxyUrl, { method: 'GET' });
 
-        if (resultado && !resultado.error) {
+        if (reqProxy.status === 200) {
+            const resultado = await reqProxy.json();
             logger.info(`Consulta bem-sucedida para a placa: ${placa}`);
-            setTimeout(() => { res.status(200).json({ status: 'success', dados: resultado }); }, 1);
+            res.status(200).json({ status: 'success', dados: resultado });
         } else {
             logger.warn(`Nenhum dado encontrado para a placa: ${placa}`);
             res.status(404).json({
                 status: 'error',
-                message: 'Placa não encontrada ou inválida.',
-                error: resultado
+                message: 'Placa não encontrada ou inválida.'
             });
         }
     } catch (error) {
