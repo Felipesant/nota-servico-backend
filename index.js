@@ -32,12 +32,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configurar o proxy para a API externa
-app.use('/api', createProxyMiddleware({
+app.use('/api:placa', createProxyMiddleware({
     target: 'https://www.tabelafipebrasil.com',
     changeOrigin: true,
     pathRewrite: {'^/api' : ''},
     onProxyReq: (proxyReq, req, res) => {
-        proxyReq.setHeader('Referer', 'https://www.tabelafipebrasil.com/placa');
+        proxyReq.setHeader('Referer', `https://www.tabelafipebrasil.com/placa?placa=${placa}`);
     }
 }));
 
