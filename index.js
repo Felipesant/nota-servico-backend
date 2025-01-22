@@ -1,13 +1,7 @@
 import express from 'express';
-import cors from 'cors';
+import cors from 'cors'; // Importe o pacote cors
 import { createLogger, format, transports } from 'winston';
-import { createProxyMiddleware } from 'http-proxy-middleware';
-
-process.on('warning', (warning) => {
-    console.warn(warning.name);    // 'DeprecationWarning'
-    console.warn(warning.message); // The `util._extend` API is deprecated
-    console.warn(warning.stack);   // Stack trace
-});
+import { consultarPlaca } from './consulta.js'; // Certifique-se de usar o caminho correto
 
 const logger = createLogger({
     level: 'info',
@@ -27,39 +21,18 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Ative o CORS para todas as rotas
-app.use(cors({
-  origin: '*',
-  optionsSuccessStatus: 200
-}));
-
-// Middleware para parsing de JSON
-app.use(express.json());
-// Middleware para parsing de URL-encoded
-app.use(express.urlencoded({ extended: true }));
-
-// Configurar o proxy para a API externa
-app.use('/api', createProxyMiddleware({
-    target: 'https://www.tabelafipebrasil.com',
-    changeOrigin: true,
-    pathRewrite: {'^/api' : ''},
-    onProxyReq: (proxyReq, req, res) => {
-        proxyReq.setHeader('Referer', 'https://www.tabelafipebrasil.com/placa');
-    }
-}));
+app.use(cors());
 
 app.get('/consulta/:placa', async (req, res) => {
     const placa = req.params.placa;
     logger.info(`Consulta recebida para a placa: ${placa}`);
 
     try {
-        // Fazer requisição via proxy
-        const proxyUrl = `https://nota-servico-backend.vercel.app/api/placa?placa=${placa}`;
-        const reqProxy = await fetch(proxyUrl, { method: 'GET' });
+        const resultado = await consultarPlaca(placa);
 
-        if (reqProxy.status === 200) {
-            const resultado = await reqProxy.json();
+        if (resultado && !resultado.error) {
             logger.info(`Consulta bem-sucedida para a placa: ${placa}`);
-            res.status(200).json({ status: 'success', dados: resultado });
+            setTimeout(() => { res.status(200).json({ status: 'success', dados: resultado }); }, 1);
         } else {
             logger.warn(`Nenhum dado encontrado para a placa: ${placa}`);
             res.status(404).json({
