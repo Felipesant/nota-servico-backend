@@ -5,6 +5,10 @@ import { consultarPlaca } from './consulta.js'; // Certifique-se de usar o camin
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import fetch from 'node-fetch';
 
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const logger = createLogger({
     level: 'info',
     format: format.combine(
