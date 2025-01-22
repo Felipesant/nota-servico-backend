@@ -3,6 +3,12 @@ import cors from 'cors';
 import { createLogger, format, transports } from 'winston';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
+process.on('warning', (warning) => {
+    console.warn(warning.name);    // 'DeprecationWarning'
+    console.warn(warning.message); // The `util._extend` API is deprecated
+    console.warn(warning.stack);   // Stack trace
+});
+
 const logger = createLogger({
     level: 'info',
     format: format.combine(
@@ -47,7 +53,7 @@ app.get('/consulta/:placa', async (req, res) => {
 
     try {
         // Fazer requisição via proxy
-        const proxyUrl = `https://nota-servico-backend.vercel.app/api/placa?placa=${placa}`;
+        const proxyUrl = `http://localhost:${port}/api/placa?placa=${placa}`;
         const reqProxy = await fetch(proxyUrl, { method: 'GET' });
 
         if (reqProxy.status === 200) {
