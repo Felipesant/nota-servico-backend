@@ -70,7 +70,7 @@ app.get('/consulta/:placa', async (req, res) => {
 app.get('/testeplaca/:placa', async (req, res) => {
     const placa = req.params.placa;
     logger.info(`Consulta recebida para a placa: ${placa}`);
-
+    await delay(2000);
     try {
         const proxyUrl = `https://nota-servico-backend.vercel.app/api/placa?placa=${placa}`;
         const reqProxy = await fetch(proxyUrl, {
@@ -83,7 +83,7 @@ app.get('/testeplaca/:placa', async (req, res) => {
                 "upgrade-insecure-requests": "1",
                 "Referer": "https://www.tabelafipebrasil.com/placa",
                 "Referrer-Policy": "strict-origin-when-cross-origin"
-            }
+            },
         });
 
         if (reqProxy.status === 200) {
