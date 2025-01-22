@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors'; // Importe o pacote cors
 import { createLogger, format, transports } from 'winston';
 import { consultarPlaca } from './consulta.js'; // Certifique-se de usar o caminho correto
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import fetch from 'node-fetch';
 
 const logger = createLogger({
     level: 'info',
