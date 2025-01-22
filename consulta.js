@@ -8,8 +8,10 @@ import { load } from 'cheerio';
 export async function consultarPlaca(placa) {
     try {
         console.log("Iniciando requisição para a URL: ", `https://www.tabelafipebrasil.com/placa?placa=${placa}`);
-        const req = await fetch(`https://www.tabelafipebrasil.com/placa?placa=${placa}`, {
+        const proxyUrl = `https://nota-servico-backend.vercel.app/api/placa?placa=${placa}`;
+        const req = await fetch(proxyUrl, {
             headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
                 "sec-ch-ua": "\"Brave\";v=\"125\", \"Chromium\";v=\"125\", \"Not.A/Brand\";v=\"24\"",
                 "sec-ch-ua-mobile": "?0",
                 "sec-ch-ua-platform": "\"Windows\"",
@@ -38,7 +40,7 @@ export async function consultarPlaca(placa) {
         const table2 = $('.fipe-desktop');
 
         table2.find('tr').each((index, element) => {
-            if (index === 0) return; 
+            if (index === 0) return;
             const row = {};
             $(element).find('td').each((i, td) => {
                 const text = $(td).text().trim();
