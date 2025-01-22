@@ -53,7 +53,7 @@ app.get('/consulta/:placa', async (req, res) => {
 
     try {
         // Fazer requisição via proxy
-        const proxyUrl = `http://localhost:${port}/api/placa?placa=${placa}`;
+        const proxyUrl = `https://nota-servico-backend.vercel.app/api/placa?placa=${placa}`;
         const reqProxy = await fetch(proxyUrl, { method: 'GET' });
 
         if (reqProxy.status === 200) {
